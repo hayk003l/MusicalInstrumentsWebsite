@@ -361,3 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/MusicalInstrumentsStore/appsettings.json
+/Frontend/Frontend.Web/appsettings.json
+/MusicalInstrumentsStore/nlog.config

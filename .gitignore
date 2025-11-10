@@ -364,3 +364,6 @@ FodyWeavers.xsd
 /MusicalInstrumentsStore/appsettings.json
 /Frontend/Frontend.Web/appsettings.json
 /MusicalInstrumentsStore/nlog.config
+/Frontend/Frontend.Web/appsettings.Development.json
+/MusicalInstrumentsStore/appsettings.Development.json
+/MusicalInstrumentsStore/appsettings.Production.json

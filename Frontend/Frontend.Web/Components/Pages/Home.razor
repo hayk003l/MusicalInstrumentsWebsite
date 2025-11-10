@@ -1,0 +1,326 @@
+﻿@page "/"
+
+<div class="home-container">
+    <section class="hero-section">
+        <div class="hero-content">
+            <h1 class="hero-title">Բարի Գալուստ Harmony Store</h1>
+            <p class="hero-subtitle">Բացահայտիր Իդեալական Հնչողությունը</p>
+            <p class="hero-description">
+                Ուսումնասիրեք մեր բազմազան երաժշտական գործիքների ընտրանին.
+                Դասական կիթառներից մինչև հարվածային գործիքներ, ընտրեք գործիք որը կխոսի ձեր հոգու հետ.
+            </p>
+            <div class="hero-buttons">
+                <a href="/items" class="btn btn-primary">Տեսնել Տեսականին</a>
+                <a href="/about" class="btn btn-secondary">Իմանալ Ավելին</a>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="music-note">♪</div>
+            <div class="music-note">♫</div>
+            <div class="music-note">♬</div>
+        </div>
+    </section>
+
+    <section class="features-section">
+        <h2 class="section-title">Ինչու Ընտրել Մեզ</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🎸</div>
+                <h3 class="feature-title">Բարձրորակ Երաժշտական Գործիքներ</h3>
+                <p class="feature-description">Հատընտիր գործիքներ միջազգային հանրահայտ արտադրողներից</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🚚</div>
+                <h3 class="feature-title">Արագ Առաքում</h3>
+                <p class="feature-description">Արագ և անվտանգ առաքում դեպի ձեր կողմից նշված հասցե</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💯</div>
+                <h3 class="feature-title">Մասնագետների Խորհրդատվություն</h3>
+                <p class="feature-description">Պրոֆեսիոնալ խորհրդատվություն բազմափորձ երաժիշտներից</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <div class="cta-content">
+            <h2 class="cta-title">Պատրա՞ստ եք Սկսել Երաժշտական Ճամփորդություն</h2>
+            <p class="cta-text">Ուսումնասիրեք մեր տեսականին և ընտրեք ձեր երաժշտական գործիքն այսօր</p>
+            <a href="/items" class="btn btn-primary btn-large">Բացահայտել Հիմա</a>
+        </div>
+    </section>
+</div>
+
+<style>
+    .home-container {
+        animation: fadeIn 0.6s ease-in;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .hero-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+        align-items: center;
+        padding: 4rem 0;
+        min-height: 500px;
+    }
+
+    .hero-content {
+        animation: slideInLeft 0.8s ease-out;
+    }
+
+    @@keyframes slideInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-50px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .hero-title {
+        font-size: 3.5rem;
+        color: #d4a574;
+        margin-bottom: 1rem;
+        line-height: 1.2;
+    }
+
+    .hero-subtitle {
+        font-size: 1.8rem;
+        color: #e8e8e8;
+        margin-bottom: 1.5rem;
+    }
+
+    .hero-description {
+        font-size: 1.1rem;
+        color: #b8b8b8;
+        line-height: 1.6;
+        margin-bottom: 2rem;
+    }
+
+    .hero-buttons {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .btn {
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        display: inline-block;
+        text-align: center;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #d4a574 0%, #c99456 100%);
+        color: #1a1a2e;
+    }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #e0b586 0%, #d4a574 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(212, 165, 116, 0.4);
+        }
+
+    .btn-secondary {
+        background: transparent;
+        border: 2px solid #d4a574;
+        color: #d4a574;
+    }
+
+        .btn-secondary:hover {
+            background: rgba(212, 165, 116, 0.1);
+            transform: translateY(-3px);
+        }
+
+    .btn-large {
+        padding: 1.2rem 3rem;
+        font-size: 1.2rem;
+    }
+
+    .hero-visual {
+        position: relative;
+        height: 400px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .music-note {
+        position: absolute;
+        font-size: 6rem;
+        color: #d4a574;
+        opacity: 0.3;
+        animation: float 3s ease-in-out infinite;
+    }
+
+        .music-note:nth-child(1) {
+            top: 10%;
+            left: 20%;
+            animation-delay: 0s;
+        }
+
+        .music-note:nth-child(2) {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 8rem;
+            opacity: 0.5;
+            animation-delay: 1s;
+        }
+
+        .music-note:nth-child(3) {
+            bottom: 10%;
+            right: 20%;
+            animation-delay: 2s;
+        }
+
+    @@keyframes float {
+        0%, 100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-20px);
+        }
+    }
+
+    .features-section {
+        padding: 4rem 0;
+    }
+
+    .section-title {
+        text-align: center;
+        font-size: 2.5rem;
+        color: #d4a574;
+        margin-bottom: 3rem;
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+    }
+
+    .feature-card {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(212, 165, 116, 0.3);
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+        .feature-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #d4a574;
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(212, 165, 116, 0.2);
+        }
+
+    .feature-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .feature-title {
+        color: #d4a574;
+        font-size: 1.3rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .feature-description {
+        color: #b8b8b8;
+        line-height: 1.6;
+    }
+
+    .cta-section {
+        background: linear-gradient(135deg, rgba(212, 165, 116, 0.1) 0%, rgba(201, 148, 86, 0.05) 100%);
+        border: 2px solid rgba(212, 165, 116, 0.3);
+        border-radius: 16px;
+        padding: 4rem;
+        margin: 4rem 0;
+        text-align: center;
+    }
+
+    .cta-title {
+        font-size: 2.5rem;
+        color: #d4a574;
+        margin-bottom: 1rem;
+    }
+
+    .cta-text {
+        font-size: 1.2rem;
+        color: #b8b8b8;
+        margin-bottom: 2rem;
+    }
+
+    @@media (max-width: 968px) {
+        .hero-section
+
+    {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .hero-visual {
+        height: 300px;
+    }
+
+    .hero-title {
+        font-size: 2.5rem;
+    }
+
+    .features-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+
+    }
+
+    @@media (max-width: 600px) {
+        .hero-buttons
+
+    {
+        flex-direction: column;
+    }
+
+    .hero-title {
+        font-size: 2rem;
+    }
+
+    .cta-section {
+        padding: 2rem;
+    }
+
+    .cta-title {
+        font-size: 1.8rem;
+    }
+
+    }
+</style>
+
+@code
+{
+
+
+    // Add your C# logic here
+
+}

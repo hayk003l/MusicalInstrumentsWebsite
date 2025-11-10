@@ -1,0 +1,329 @@
+﻿@page "/items"
+
+
+<div class="items-container">
+    <div class="page-header">
+        <h1 class="page-title">Մեր Երաժշտական Գործիքների Ընտրանին</h1>
+        <p class="page-subtitle">Գտիր քո անթերի գործիքը</p>
+    </div>
+
+    <div class="filters-section">
+        <div class="filter-group">
+            <label class="filter-label">Որոնել</label>
+            <input type="text" class="filter-input" placeholder="Որոնել գործիքներ..." @bind="_searchTerm"/>
+        </div>
+
+        <div class="filter-group">
+            <label class="filter-label">Մին․ Գին (Դր)</label>
+            <input type="number" class="filter-input" placeholder="0" min="0" step="5000" @bind="_minPrice"/>
+        </div>
+
+        <div class="filter-group">
+            <label class="filter-label">Մաքս․ Գին (Դր)</label>
+            <input type="number" class="filter-input" placeholder="10000" min="0" step="5000" @bind="_maxPrice"/>
+        </div>
+
+        <button class="btn-filter" @onclick="ApplyFilters">Կիրառել Ֆիլտրները</button>
+        <button class="btn-reset" href="/items" @onclick="ResetFilters">Վերականգնել</button>
+    </div>
+
+    <div class="items-grid">
+        @if (ItemDtos is null)
+        {
+            <p>Loading...</p>
+        }
+        else 
+        {
+            @foreach(var Item in ItemDtos)
+            {
+                <div class="item-card">
+                    @* <div class="item-image-placeholder">
+                        <span class="placeholder-icon">🎸</span>
+                    </div> *@
+                    <div class="item-details">
+                        <h3 class="item-name">@Item.Name</h3>
+                        <p class="item-price">@Item.Amount Դր․</p>
+                        <a href="/item/{@Item.Id}" class="btn-view">Տեսնել Մանրամասները</a>
+                    </div>
+                </div>
+            }
+
+        }
+
+        <!-- Add more items dynamically through your C# code -->
+    </div>
+
+    <div class="no-results" style="display: none;">
+        <p>Արդյունքներ չի գտնվել</p>
+    </div>
+</div>
+
+<style>
+    .items-container {
+        animation: fadeIn 0.6s ease-in;
+    }
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .page-title {
+        font-size: 3rem;
+        color: #d4a574;
+        margin-bottom: 0.5rem;
+    }
+
+    .page-subtitle {
+        font-size: 1.2rem;
+        color: #b8b8b8;
+    }
+
+    .filters-section {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(212, 165, 116, 0.3);
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 3rem;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        align-items: end;
+    }
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .filter-label {
+        color: #d4a574;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .filter-input {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(212, 165, 116, 0.3);
+        border-radius: 8px;
+        padding: 0.8rem;
+        color: #e8e8e8;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+        .filter-input:focus {
+            outline: none;
+            border-color: #d4a574;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .filter-input::placeholder {
+            color: #6b6b6b;
+        }
+
+    .btn-filter,
+    .btn-reset {
+        padding: 0.8rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-filter {
+        background: linear-gradient(135deg, #d4a574 0%, #c99456 100%);
+        color: #1a1a2e;
+    }
+
+        .btn-filter:hover {
+            background: linear-gradient(135deg, #e0b586 0%, #d4a574 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(212, 165, 116, 0.4);
+        }
+
+    .btn-reset {
+        background: transparent;
+        border: 2px solid #d4a574;
+        color: #d4a574;
+    }
+
+        .btn-reset:hover {
+            background: rgba(212, 165, 116, 0.1);
+            transform: translateY(-2px);
+        }
+
+    .items-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+
+    .item-card {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(212, 165, 116, 0.3);
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+        .item-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #d4a574;
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(212, 165, 116, 0.3);
+        }
+
+    .item-image-placeholder {
+        background: linear-gradient(135deg, rgba(212, 165, 116, 0.2) 0%, rgba(201, 148, 86, 0.1) 100%);
+        height: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-bottom: 1px solid rgba(212, 165, 116, 0.3);
+    }
+
+    .placeholder-icon {
+        font-size: 5rem;
+        opacity: 0.6;
+    }
+
+    .item-details {
+        padding: 1.5rem;
+    }
+
+    .item-name {
+        color: #e8e8e8;
+        font-size: 1.3rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .item-price {
+        color: #d4a574;
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+    }
+
+    .btn-view {
+        display: block;
+        width: 100%;
+        padding: 0.8rem;
+        background: linear-gradient(135deg, #d4a574 0%, #c99456 100%);
+        color: #1a1a2e;
+        text-decoration: none;
+        text-align: center;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+        .btn-view:hover {
+            background: linear-gradient(135deg, #e0b586 0%, #d4a574 100%);
+            box-shadow: 0 4px 12px rgba(212, 165, 116, 0.4);
+        }
+
+    .no-results {
+        text-align: center;
+        padding: 4rem;
+        color: #b8b8b8;
+        font-size: 1.2rem;
+    }
+
+    @@media (max-width: 768px) {
+        .page-title
+
+    {
+        font-size: 2rem;
+    }
+
+    .filters-section {
+        grid-template-columns: 1fr;
+    }
+
+    .items-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+@code
+{
+
+
+    // Add your C# logic here
+
+
+    // Example properties:
+
+
+    // private List<Instrument> instruments;
+
+
+    // private string searchTerm = "";
+
+
+    // private decimal minPrice = 0;
+
+
+    // private decimal maxPrice = 10000;
+
+
+
+    // protected override async Task OnInitializedAsync()
+
+
+    // {
+
+
+    //     await LoadInstruments();
+
+
+    // }
+
+
+
+    // private async Task LoadInstruments()
+
+
+    // {
+
+
+    //     // Load instruments from API
+
+
+    // }
+
+
+
+    // private async Task ApplyFilters()
+
+
+    // {
+
+
+    //     // Filter logic
+
+
+    // }
+
+}

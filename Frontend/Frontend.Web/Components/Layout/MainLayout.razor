@@ -1,0 +1,203 @@
+﻿@inherits LayoutComponentBase
+@using Microsoft.AspNetCore.Components.Authorization
+
+<div class="page-container">
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="nav-brand">
+                <a href="/" class="brand-link">
+                    <span class="music-icon">🎵</span>
+                    <span class="brand-text">Harmony Store</span>
+                </a>
+            </div>
+
+            <div class="nav-links">
+                <a href="/" class="nav-link">Գլխավոր</a>
+                <a href="/items" class="nav-link">Երաժշտական Գործիքներ</a>
+                <button class="nav-link" @onclick="OrdersNav">Իմ Պատվերները</button>
+                <a href="/about" class="nav-link">Մեր Մասին</a>
+                <AuthorizeView Roles="Admin">
+                            <a href="/admin" class="nav-link">Admin</a>                   
+                </AuthorizeView >
+                <AuthorizeView>                 
+                    <NotAuthorized>
+                        <a href="/auth" class="nav-link auth-link">Մուտք</a>
+                    </NotAuthorized>
+                    <Authorized>
+                        <button class="nav-link auth-link" @onclick="Logout">Դուրս Գալ</button>
+                    </Authorized>
+                </AuthorizeView>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        @Body
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2024 Harmony Store. Բոլոր իրավունքները պաշտպանված են.</p>
+        </div>
+    </footer>
+</div>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        color: #e8e8e8;
+        min-height: 100vh;
+    }
+
+    .page-container {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .navbar {
+        background: rgba(26, 26, 46, 0.95);
+        border-bottom: 2px solid #d4a574;
+        padding: 1rem 2rem;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        backdrop-filter: blur(10px);
+    }
+
+    .nav-content {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .nav-brand {
+        display: flex;
+        align-items: center;
+    }
+
+    .brand-link {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        color: #d4a574;
+        font-size: 1.5rem;
+        font-weight: bold;
+        gap: 0.5rem;
+        transition: transform 0.3s ease;
+    }
+
+        .brand-link:hover {
+            transform: scale(1.05);
+        }
+
+    .music-icon {
+        font-size: 2rem;
+    }
+
+    .nav-links {
+        display: flex;
+        gap: 2rem;
+        align-items: center;
+    }
+
+    .nav-link {
+        color: #e8e8e8;
+        text-decoration: none;
+        font-size: 1rem;
+        padding: 0.5rem 1rem;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: #d4a574;
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .nav-link:hover {
+            color: #d4a574;
+        }
+
+            .nav-link:hover::after {
+                width: 80%;
+            }
+
+    .auth-link {
+        background: linear-gradient(135deg, #d4a574 0%, #c99456 100%);
+        color: #1a1a2e;
+        font-weight: 600;
+    }
+
+        .auth-link:hover {
+            background: linear-gradient(135deg, #e0b586 0%, #d4a574 100%);
+            color: #1a1a2e;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(212, 165, 116, 0.4);
+        }
+
+        .auth-link::after {
+            display: none;
+        }
+
+    .main-content {
+        flex: 1;
+        padding: 2rem;
+        max-width: 1400px;
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    .footer {
+        background: rgba(26, 26, 46, 0.95);
+        border-top: 2px solid #d4a574;
+        padding: 2rem;
+        text-align: center;
+        margin-top: auto;
+    }
+
+    .footer-content {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+        .footer-content p {
+            color: #b8b8b8;
+            margin: 0.5rem 0;
+        }
+
+    @@media (max-width: 768px) {
+        .nav-links
+
+    {
+        gap: 1rem;
+    }
+
+    .nav-link {
+        padding: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .main-content {
+        padding: 1rem;
+    }
+
+    }
+</style>

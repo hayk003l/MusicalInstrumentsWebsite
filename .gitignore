@@ -367,3 +367,4 @@ FodyWeavers.xsd
 /Frontend/Frontend.Web/appsettings.Development.json
 /MusicalInstrumentsStore/appsettings.Development.json
 /MusicalInstrumentsStore/appsettings.Production.json
+/MusicalInstrumentsStore/internal_logs/internallog.txt

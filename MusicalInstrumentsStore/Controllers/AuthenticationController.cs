@@ -47,18 +47,25 @@ namespace MusicalInstrumentsStore.Controllers
         [HttpGet("info")]
         public IActionResult GetUserInfo()
         {
-            var userName = _service.UserContextService.GetUserUsername();
-            var userId = _service.UserContextService.GetUserId();
-            var userRoles = _service.UserContextService.GetUserRole();
-
-            var userDto = new UserDto
+            try
             {
-                Username = userName,
-                Id = userId,
-                Roles = userRoles
-            };
+                var userName = _service.UserContextService.GetUserUsername();
+                var userId = _service.UserContextService.GetUserId();
+                var userRoles = _service.UserContextService.GetUserRole();
 
-            return Ok(userDto);
+                var userDto = new UserDto
+                {
+                    Username = userName,
+                    Id = userId,
+                    Roles = userRoles
+                };
+
+                return Ok(userDto);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new {message =  ex.Message});
+            }
         }
     }
 }

@@ -13,9 +13,9 @@
 
             <div class="nav-links">
                 <a href="/" class="nav-link">Գլխավոր</a>
-                <a href="/items" class="nav-link">Երաժշտական Գործիքներ</a>
-                <button class="nav-link" @onclick="OrdersNav">Իմ Պատվերները</button>
-                <a href="/about" class="nav-link">Մեր Մասին</a>
+                <a href="/items" class="nav-link">Երաժշտական գործիքներ</a>
+                <button class="nav-link" @onclick="OrdersNav">Իմ պատվերները</button>
+                <a href="/about" class="nav-link">Մեր մասին</a>
                 <AuthorizeView Roles="Admin">
                             <a href="/admin" class="nav-link">Admin</a>                   
                 </AuthorizeView >
@@ -24,7 +24,7 @@
                         <a href="/auth" class="nav-link auth-link">Մուտք</a>
                     </NotAuthorized>
                     <Authorized>
-                        <button class="nav-link auth-link" @onclick="Logout">Դուրս Գալ</button>
+                        <button class="nav-link auth-link" @onclick="Logout">Դուրս գալ</button>
                     </Authorized>
                 </AuthorizeView>
             </div>

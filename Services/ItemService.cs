@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore.Metadata;
-using Service.Contracts;
+﻿using Service.Contracts;
 using Contracts;
 using AutoMapper;
-using Microsoft.Identity.Client;
 using Shared.DataTransferObjects;
 using Entities.Models;
 using Shared.RequestFeatures;
+using Microsoft.AspNetCore.Http;
+using Amazon.S3;
+using Amazon.S3.Transfer;
+using Microsoft.Extensions.Configuration;
+using Entities.Exceptions;
 
 namespace Services { 
 
@@ -18,25 +16,43 @@ namespace Services {
     {
         private readonly IRepositoryManager _repository;
         private readonly IMapper _mapper;
-
-        public ItemService(IRepositoryManager repository, IMapper mapper )
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IAmazonS3 _s3Client;
+        private readonly IConfiguration _configuration;
+        public ItemService(IRepositoryManager repository,
+            IMapper mapper,
+            IHttpContextAccessor httpContextAccessor,
+            IAmazonS3 s3Client,
+            IConfiguration configuration)
         {
             _repository = repository;
             _mapper = mapper;
+            _httpContextAccessor = httpContextAccessor;
+            _s3Client = s3Client;
+            _configuration = configuration;
         }
 
         public async Task<IEnumerable<ItemDto>> GetItemsAsync(ItemsParameters itemsParameters, bool trackingChanges)
         {
             if (!itemsParameters.ValidPriceRange)
             {
-                throw new Exception("Wrong given range");
+                throw new ArgumentOutOfRangeException("Wrong given range");
             }
             var result = await _repository.ItemRepository.GetItemsAsync(itemsParameters, trackingChanges);
+
+            if (result is null)
+            {
+                throw new ItemsNotFoundException();
+            }
 
             var itemsDtos = _mapper.Map<IEnumerable<ItemDto>>(result);
             foreach (var item in itemsDtos)
             {
                 var description = await _repository.DescriptionRepository.GetDescriptionForItem(item.Id, trackingChanges);
+                if (description is null)
+                {
+                    throw new DescriptionNotFoundException(item.Id);
+                }
                 item.Description = _mapper.Map<DescriptionDto>(description);
             }
 
@@ -46,10 +62,16 @@ namespace Services {
         public async Task<ItemDto> GetItemAsync(Guid id, bool trackingChanges)
         {
             var result = await _repository.ItemRepository.GetItemAsync(id, trackingChanges);
-
+            if (result is null)
+            {
+                throw new ItemNotFoundException(id);
+            }
             var itemDto = _mapper.Map<ItemDto>(result);
             var description = await _repository.DescriptionRepository.GetDescriptionForItem(id, trackingChanges);
-
+            if (description is null)
+            {
+                throw new DescriptionNotFoundException(itemDto.Id);
+            }
             itemDto.Description = _mapper.Map<DescriptionDto>(description);
 
             return itemDto;
@@ -58,8 +80,45 @@ namespace Services {
         public async Task<ItemDto> CreateItemAsync(ItemForCreationDto itemForCreation)
         {
             var item = _mapper.Map<Item>(itemForCreation);
-            //var description = _mapper.Map<Description>(itemForCreation.Description);
-            //item.Description = description;
+
+            if (itemForCreation.ImageFile != null && itemForCreation.ImageFile.Length > 0)
+            {
+                if (!itemForCreation.ImageFile.ContentType.StartsWith("image"))
+                {
+                    throw new ArgumentException("Only image files are allowed.");
+                }
+
+                var awsSection = _configuration.GetSection("AWS");
+                var bucketName = awsSection["BucketName"];
+
+                var region = _configuration["AWS:Region"];
+                var fileName = $"{Guid.NewGuid()}_{itemForCreation.ImageFile.FileName}";
+                var key = $"images/{fileName}";
+
+                try
+                {
+                    using (var stream = itemForCreation.ImageFile.OpenReadStream())
+                    {
+                        var uploadRequest = new TransferUtilityUploadRequest
+                        {
+                            InputStream = stream,
+                            Key = key,
+                            BucketName = bucketName,
+                            ContentType = itemForCreation.ImageFile.ContentType,
+                        };
+
+                        Console.WriteLine($"BUCKET NAME IS ----- {uploadRequest.BucketName}");
+
+                        var transferUtility = new TransferUtility(_s3Client);
+                        await transferUtility.UploadAsync(uploadRequest);
+                    }
+                    item.ImageUrl = $"https://{bucketName}.s3.{region}.amazonaws.com/{key}";
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
 
             _repository.ItemRepository.CreateItem(item);
             await _repository.SaveAsync();
@@ -89,7 +148,7 @@ namespace Services {
             var item = await _repository.ItemRepository.GetItemAsync(id, trackingChanges);
             if (item is null)
             {
-                throw new NullReferenceException(nameof(item));
+                throw new ItemNotFoundException(id);
             }
             return item;
         }
@@ -100,7 +159,7 @@ namespace Services {
 
             if (itemEntity is null)
             {
-                throw new NullReferenceException($"{nameof(itemEntity)} is null");
+                throw new ItemNotFoundException(id); 
             }
 
             var itemToPatch = _mapper.Map<ItemForUpdatingDto>(itemEntity);

@@ -10,7 +10,7 @@ namespace Entities.Models
     public class Order : BaseModel
     {
         public Guid ItemId { get; set; }
-        public Item? ItemNavigation { get; set; }
+        public Item ItemNavigation { get; set; }
 
         public Guid UserId { get; set; }
         public User User { get; set; }

@@ -59,7 +59,7 @@ namespace Frontend.Web.Components.Services
                 var identity = new ClaimsIdentity(claims, "jwt");
                 var user = new ClaimsPrincipal(identity);
 
-                var response = await _httpClient.GetAsync("https://localhost:7028/api/authentication/info");
+                var response = await _httpClient.GetAsync("http://production.eba-i8qxebcm.eu-north-1.elasticbeanstalk.com/api/authentication/info");
                 if (response.IsSuccessStatusCode)
                 {
                     return new AuthenticationState(user);
@@ -84,7 +84,7 @@ namespace Frontend.Web.Components.Services
 
             try
             {
-                var response = await _httpClient.PostAsJsonAsync("https://localhost:7028/api/authentication/login", userForAuthentication);
+                var response = await _httpClient.PostAsJsonAsync("http://production.eba-i8qxebcm.eu-north-1.elasticbeanstalk.com/api/authentication/login", userForAuthentication);
                 if (response.IsSuccessStatusCode)
                 {
                     var strResponse = await response.Content.ReadAsStringAsync();
@@ -101,7 +101,17 @@ namespace Frontend.Web.Components.Services
                 }
                 else
                 {
-                    return new FormatResults { Succeeded = false, Errors = ["Wrong username or password"] };
+                    var errorResponse = await response.Content.ReadFromJsonAsync<FormatResults>();
+                    var errors = new List<string>();
+                    foreach(var error in errorResponse.Errors)
+                    {
+                        errors.Add(error);
+                    }
+                    return new FormatResults
+                    {
+                        Succeeded = false,
+                        Errors = errors.ToArray()
+                    };
                 }
             }
             catch (Exception) 

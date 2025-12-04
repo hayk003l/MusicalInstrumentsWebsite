@@ -11,11 +11,13 @@ namespace Entities.Models
     public class Item : BaseModel
     {
 
-        public string? Name { get; set; }
-        public decimal? Amount { get; set; }
+        public string Name { get; set; }
+        public decimal Amount { get; set; }
+
+        public string ImageUrl { get; set; }
 
         public IEnumerable<Order> Orders { get; set; } = new List<Order>();
-        public Description? Description { get; set; }
+        public Description Description { get; set; }
 
     }
 }

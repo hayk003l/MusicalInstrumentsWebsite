@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
 using Shared.DataTransferObjects;
-using System.Security.Claims;
-using System.Threading.Tasks.Sources;
+using System.Data.Common;
 
 namespace MusicalInstrumentsStore.Controllers
 {
@@ -32,10 +30,17 @@ namespace MusicalInstrumentsStore.Controllers
         [HttpGet("user")]
         public async Task<IActionResult> GetOrdersForUser()
         {
-            Guid userId = _service.UserContextService.GetUserId();
-            var result = await _service.OrderService.GetOrdersForUserAsync(userId, trackingChanges: false);
-                
-            return Ok(result);
+            try
+            {
+                Guid userId = _service.UserContextService.GetUserId();
+                var result = await _service.OrderService.GetOrdersForUserAsync(userId, trackingChanges: false);
+
+                return Ok(result);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
         }
 
         [HttpGet]
@@ -50,19 +55,36 @@ namespace MusicalInstrumentsStore.Controllers
         [HttpGet("user/{id:guid}", Name = "MyOrders")]
         public async Task<IActionResult> GetOrderForUser(Guid id)
         {
-            Guid userId = _service.UserContextService.GetUserId();
-            var result = await _service.OrderService.GetOrderForUserAsync(userId, id, trackingChanges: false);
+            try
+            {
+                Guid userId = _service.UserContextService.GetUserId();
+                var result = await _service.OrderService.GetOrderForUserAsync(userId, id, trackingChanges: false);
 
-            return Ok(result);
+                return Ok(result);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
         }
 
         [HttpPost("user")]
         public async Task<IActionResult> CreateOrder([FromBody] OrderForCreationDto orderForCreating)
         {
-            var userId = _service.UserContextService.GetUserId();
-            var result = await _service.OrderService.CreateOrderAsync(userId, orderForCreating);
+            try
+            {
+                var userId = _service.UserContextService.GetUserId();
+                var result = await _service.OrderService.CreateOrderAsync(userId, orderForCreating);
 
-            return CreatedAtRoute("MyOrders", new { id = result.Id }, result);
+                return CreatedAtRoute("MyOrders", new { id = result.Id }, result);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
+            catch (Exception ex) {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpDelete("{id:guid}")]

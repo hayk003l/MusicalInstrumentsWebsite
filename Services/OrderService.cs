@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Service.Contracts;
+﻿using Service.Contracts;
 using Contracts;
 using AutoMapper;
 using Shared.DataTransferObjects;
 using Entities.Models;
-using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
+using Entities.Exceptions;
 
 namespace Services
 {
@@ -26,13 +21,19 @@ namespace Services
         public async Task<OrderForAdminDto> GetOrderForAdminAsync(Guid id, bool trackingChanges)
         {
             var order = await _repository.OrderRepository.GetOrderAsync(id, trackingChanges);
-            if ( order is null)
+            if (order is null)
             {
-                throw new NullReferenceException("Nothing finded");
+                throw new OrderNotFoundException(id);
             }
             
             var orderDto = _mapper.Map<OrderForAdminDto>(order);
             var item = await _repository.ItemRepository.GetItemAsync(order.ItemId, trackingChanges);
+
+            if (item is null)
+            {
+                throw new ItemNotFoundException(order.ItemId);
+            }
+
             orderDto.Item = _mapper.Map<ItemForOrderDto>(item);
 
             var shippingDetails = await _repository.ShippingDetailsRepository.GetShippingDetailsForOrderAsync(order.Id, trackingChanges);
@@ -46,14 +47,24 @@ namespace Services
             var order = await _repository.OrderRepository.GetOrderForUserAsync(userId, id, trackingChanges);
             if (order is null)
             {
-                throw new NullReferenceException("Nothing finded");
+                throw new OrderNotFoundException(id);
             }
 
             var orderDto = _mapper.Map<OrderForUserDto>(order);
             var item = await _repository.ItemRepository.GetItemAsync(order.ItemId, trackingChanges);
+
+            if (item is null)
+            {
+                throw new ItemNotFoundException(order.ItemId);
+            }
+
             orderDto.Item = _mapper.Map<ItemForOrderDto>(item);
 
             var shippingDetails = await _repository.ShippingDetailsRepository.GetShippingDetailsForOrderAsync(order.Id, trackingChanges);
+            if (shippingDetails is null)
+            {
+                throw new ShippingDetailsNotFoundException(orderDto.Id);
+            }
             orderDto.ShippingDetails = _mapper.Map<ShippingDetailsDto>(shippingDetails);
 
             return orderDto;
@@ -65,13 +76,17 @@ namespace Services
 
             if (orders is null)
             {
-                throw new NullReferenceException("Nothing finded");
+                throw new OrdersNotFoundException();
             }
 
             var orderDto = _mapper.Map<IEnumerable<OrderForAdminDto>>(orders);
             foreach(var order in orderDto)
             {
                 var item = await _repository.ItemRepository.GetItemAsync(order.Item.Id, trackingChanges);
+                if (item is null) 
+                {
+                    throw new ItemNotFoundException(order.Id);
+                }
                 order.Item = _mapper.Map<ItemForOrderDto>(item);
             }
             return orderDto;
@@ -83,7 +98,7 @@ namespace Services
 
             if (orders is null)
             {
-                throw new NullReferenceException("Nothing finded");
+                throw new OrdersNotFoundException();
             }
 
             var orderDto = _mapper.Map<IEnumerable<OrderForUserDto>>(orders);
@@ -91,8 +106,20 @@ namespace Services
             foreach( var order in orderDto) 
             {
                 var item = await _repository.ItemRepository.GetItemAsync(order.Item.Id, trackingChanges);
+
+                if (item is null)
+                {
+                    throw new ItemNotFoundException(order.Id);
+                }
+
                 order.Item = _mapper.Map<ItemForOrderDto>(item);
                 var shippingDetails = await _repository.ShippingDetailsRepository.GetShippingDetailsForOrderAsync(order.Id, trackingChanges);
+
+                if (shippingDetails is null)
+                {
+                    throw new ShippingDetailsNotFoundException(order.Id);
+                }
+
                 order.ShippingDetails = _mapper.Map<ShippingDetailsDto>(shippingDetails);
             }
             return orderDto;
@@ -114,6 +141,11 @@ namespace Services
         public async Task DeleteOrderAsync(Guid id, bool trackingChanges)
         {
             var order = await _repository.OrderRepository.GetOrderAsync(id, trackingChanges);
+
+            if (order is null)
+            {
+                throw new OrderNotFoundException(id);
+            }
 
             _repository.OrderRepository.DeleteOrder(order);
             await _repository.SaveAsync();

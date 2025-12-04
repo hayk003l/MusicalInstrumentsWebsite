@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Entities.Models;
-using Microsoft.AspNetCore.Mvc.Filters;
 using Shared.DataTransferObjects;
 
 namespace MusicalInstrumentsStore

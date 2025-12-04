@@ -34,8 +34,8 @@ namespace Repository.Migrations
                         .HasColumnType("nvarchar(60)");
 
                     b.Property<string>("DescriptionText")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("ItemId")
                         .HasColumnType("char(36)");
@@ -88,10 +88,13 @@ namespace Repository.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(7,1)");
 
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("longtext");
+
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<DateTime>("TimeStamp")
                         .IsConcurrencyToken()

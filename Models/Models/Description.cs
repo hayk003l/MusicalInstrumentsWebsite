@@ -12,9 +12,9 @@ namespace Entities.Models
         public Guid ItemId { get; set; }
         public Item ItemNavigation { get; set; }
 
-        public string? Country { get; set; }
+        public string Country { get; set; }
 
-        public string? DescriptionText { get; set; }
+        public string DescriptionText { get; set; }
 
     }
 }

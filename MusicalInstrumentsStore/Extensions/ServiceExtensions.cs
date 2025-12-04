@@ -1,14 +1,17 @@
 ﻿using Contracts;
-using LoggerService;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Entities.Models;
-using Repository;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using LoggerService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using System.Text;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.OData;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using MusicalInstrumentsStore.Validators;
+using Repository;
+using System.Text;
 
 namespace MusicalInstrumentsStore.Extensions
 {
@@ -27,8 +30,8 @@ namespace MusicalInstrumentsStore.Extensions
             services.Configure<IISOptions>(options => { });
 
         public static void ConfigureMySqlContext(this IServiceCollection services, IConfiguration configuration) =>
-            services.AddDbContext<RepositoryContext>(options => options.UseMySql(configuration.GetConnectionString("sqlConnection"),
-                ServerVersion.AutoDetect(configuration.GetConnectionString("sqlConnection"))));
+            services.AddDbContext<RepositoryContext>(options => options.UseMySql(configuration.GetConnectionString("DefaultConnection"),
+                ServerVersion.AutoDetect(configuration.GetConnectionString("DefaultConnection"))));
 
         public static void ConfigureLoggerManager(this IServiceCollection services) => services.AddSingleton<ILoggerManager, LoggerManager>();
 
@@ -49,7 +52,7 @@ namespace MusicalInstrumentsStore.Extensions
         public static void ConfigureJWT(this IServiceCollection services, IConfiguration configuration)
         {
             var jwtSettings = configuration.GetSection("JwtSettings");
-            var secretKey = Environment.GetEnvironmentVariable("SECRET");
+            var secretKey = jwtSettings["SecretKey"];
 
             services.AddAuthentication(opt =>
             {
@@ -65,8 +68,8 @@ namespace MusicalInstrumentsStore.Extensions
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
 
-                    ValidIssuer = jwtSettings["validIssuer"],
-                    ValidAudience = jwtSettings["validAudience"],
+                    ValidIssuer = jwtSettings["Issuer"],
+                    ValidAudience = jwtSettings["Audience"],
 
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
                 };
@@ -109,5 +112,22 @@ namespace MusicalInstrumentsStore.Extensions
             });
 
         }
+        public static void ConfigureValidationOptions(this IServiceCollection services)
+        {
+            services.AddFluentValidationAutoValidation();
+            services.AddFluentValidationClientsideAdapters();
+            services.AddValidatorsFromAssemblyContaining<DescriptionForManipulationDtoValidator>();
+            services.AddValidatorsFromAssemblyContaining<ItemForCreationDtoValidator>();
+            services.AddValidatorsFromAssemblyContaining<ShippingDetailsForCreationDtoValidator>();
+            services.AddValidatorsFromAssemblyContaining<UserForAuthenticationDtoValidator>();
+            services.AddValidatorsFromAssemblyContaining<UserForRegistrationDtoValidator>();
+
+        }
+
+        public static void ConfigureOData(this IServiceCollection services)
+        {
+            services.AddOData();
+        }
+
     }
 }

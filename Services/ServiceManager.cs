@@ -1,19 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore.Metadata;
-using Service.Contracts;
+﻿using Service.Contracts;
 using Contracts;
 using AutoMapper;
 using Service;
 using Microsoft.AspNetCore.Identity;
 using Entities.Models;
-using System.Configuration;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Http;
+using Amazon.S3;
 
 namespace Services
 {
@@ -26,13 +19,15 @@ namespace Services
         public readonly Lazy<IAuthenticationService> _autheticationService;
         public readonly Lazy<IUserContextService> _userContextService;
         public ServiceManager (IRepositoryManager repositoryManager, 
+            ILoggerManager loggerManager,
             IMapper mapper,
             UserManager<User> userManager,
             IConfiguration configuration,
             RoleManager<IdentityRole<Guid>> roleManager,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            IAmazonS3 amazonS3)
         {
-            _itemService = new Lazy<IItemService>(() => new ItemService(repositoryManager, mapper));
+            _itemService = new Lazy<IItemService>(() => new ItemService(repositoryManager, mapper, httpContextAccessor, amazonS3, configuration));
             _orderService = new Lazy<IOrderService>(() => new OrderService(repositoryManager, mapper)); 
             _descriptionService = new Lazy<IDescriptionService>(() => new DescriptionService(repositoryManager, mapper));
             _shippingService = new Lazy<IShippingDetailsService>(() => new ShippingDetailsService(repositoryManager, mapper));

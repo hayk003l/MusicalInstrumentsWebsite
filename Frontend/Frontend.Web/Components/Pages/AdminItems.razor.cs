@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using Shared.DataTransferObjects;
 
 namespace Frontend.Web.Components.Pages
@@ -61,6 +62,19 @@ namespace Frontend.Web.Components.Pages
         private bool isEditMode = false;
         private Guid selectedItemId;
 
+        private IBrowserFile _selectedImageFile;
+        private string _imagePreviewUrl;
+
+        private void HandleImageSelected(InputFileChangeEventArgs e)
+        {
+            _selectedImageFile = e.File;
+
+            //using var stream = _selectedImageFile.OpenReadStream(maxAllowedSize: 5_000_000);
+            //var buffer = new byte[_selectedImageFile.Size];
+            //stream.Read(buffer, 0, (int)_selectedImageFile.Size);
+
+            //_imagePreviewUrl = $"data:{_selectedImageFile.ContentType};base64,{Convert.ToBase64String(buffer)}";
+        }
         private void ShowAddModel()
         {
             isEditMode = false;
@@ -105,19 +119,25 @@ namespace Frontend.Web.Components.Pages
             }
             else
             {
-                _itemForCreation.Name = _name;
-                _itemForCreation.Amount = _price;
-                _descriptionForCreation.DescriptionText = _description;
-                _descriptionForCreation.Country = _country;
-                _itemForCreation.Description = _descriptionForCreation;
-                await ApiClient.PostAsync<ItemForCreationDto>("api/items", _itemForCreation);
+                var formData = new MultipartFormDataContent();
+                formData.Add(new StringContent(_name), nameof(_itemForCreation.Name));
+                formData.Add(new StringContent(_price.ToString()), nameof(_itemForCreation.Amount));
+                formData.Add(new StringContent(_description), "Description.DescriptionText");
+                formData.Add(new StringContent(_country), "Description.Country");
+                if (_selectedImageFile != null)
+                {
+                    var streamContent = new StreamContent(_selectedImageFile.OpenReadStream(maxAllowedSize: 5_000_000));
+                    streamContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(_selectedImageFile.ContentType);
+                    formData.Add(streamContent, nameof(_itemForCreation.ImageFile), _selectedImageFile.Name);
+                }
+                await ApiClient.PostWithFormAsync("api/items", formData);
             }
             CloseModel();
         }
 
         private async Task ConfirmDelete()
         {
-            await HttpClient.DeleteAsync($"https://localhost:7028/api/items/{selectedItemId}");
+            await ApiClient.DeleteAsync($"api/items/{selectedItemId}");
             CloseDeleteModel();
         }
 

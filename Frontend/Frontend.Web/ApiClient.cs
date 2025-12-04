@@ -1,6 +1,4 @@
 using Blazored.LocalStorage;
-using Microsoft.AspNetCore.Components;
-using System.Net.Http;
 using System.Net.Http.Headers;
 
 namespace Frontend.Web;
@@ -9,7 +7,6 @@ public class ApiClient
 {
     private readonly HttpClient _httpClient;
     private readonly ILocalStorageService _localStorage;
-
     public ApiClient(HttpClient httpClient, ILocalStorageService localStorage)
     {
         _httpClient = httpClient;
@@ -48,11 +45,22 @@ public class ApiClient
 
     }
 
+    public async Task PostWithFormAsync(string path, MultipartFormDataContent model, CancellationToken cancellationToken = default)
+    {
+        await AddAuthorizationHeaderAsync();
+        await _httpClient.PostAsync(path, model, cancellationToken);
+    }
     public async Task PutAsync<T>(string path, T model, CancellationToken cancellationToken = default)
     {
         await AddAuthorizationHeaderAsync();
         await _httpClient.PutAsJsonAsync<T>(path, model);
+    }
 
+
+    public async Task DeleteAsync(string path, CancellationToken cancellation = default)
+    {
+        await AddAuthorizationHeaderAsync();
+        await _httpClient.DeleteAsync(path, cancellation);
     }
 }
 

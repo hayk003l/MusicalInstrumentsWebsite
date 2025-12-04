@@ -37,7 +37,7 @@ namespace Frontend.Web.Components.Pages
             _orderForCreation.ItemId = ItemDto.Id;
             _shippingDetailsForCreation.Address = _address;
             _orderForCreation.ShippingDetails = _shippingDetailsForCreation;
-            await ApiClient.PostAsync<OrderForCreationDto>("https://localhost:7028/api/orders/user", _orderForCreation);
+            await ApiClient.PostAsync<OrderForCreationDto>("api/orders/user", _orderForCreation);
 
             CloseModel();
         }

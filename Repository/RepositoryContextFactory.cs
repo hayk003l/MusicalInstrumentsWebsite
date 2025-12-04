@@ -1,10 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Repository
 {
@@ -14,7 +10,7 @@ namespace Repository
         {
             var optionsBuilder = new DbContextOptionsBuilder<RepositoryContext>();
             var stringBuilder = new StringBuilder();
-            stringBuilder.AppendLine("Server=localhost;Port=3306;Database=musicalinstrumentsstore;User Id=root;Password=123456;");
+            stringBuilder.AppendLine("Server=musical-instruments-db.cfao2gm6ax16.eu-north-1.rds.amazonaws.com;Port=3306;Database=MusicalInstrumentsDB;User=admin;Password=Kjkszpj11$;SslMode=Required;");
             optionsBuilder.UseMySql(stringBuilder.ToString(), ServerVersion.AutoDetect(stringBuilder.ToString()));
 
             return new RepositoryContext(optionsBuilder.Options);

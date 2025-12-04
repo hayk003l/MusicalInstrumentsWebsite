@@ -28,11 +28,6 @@ namespace Frontend.Web.Components.Pages
             }
         }
 
-        private async Task SwitchTab(string tab)
-        {
-            Console.WriteLine($"SwitchTab called: {tab}");
-            await JS.InvokeVoidAsync("authTabs.setActiveTab", tab);
-        }
     }
 }
 

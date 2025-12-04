@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Entities.Models.Base;
-using Entities.Models;
+﻿using Entities.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design;
 using Repository.Seed;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
@@ -29,8 +22,8 @@ namespace Repository
             modelBuilder.Entity<Item>(entity =>
             {
                 entity.Property(n => n.Name)
-                .HasColumnType("nvarchar(50)")
-                .HasMaxLength(50)
+                .HasColumnType("nvarchar(200)")
+                .HasMaxLength(200)
                 .IsRequired(true);
 
                 entity.Property(n => n.Amount)
@@ -67,8 +60,8 @@ namespace Repository
                 .IsRequired(true);
 
                 entity.Property(p => p.DescriptionText)
-                .HasColumnType("nvarchar(250)")
-                .HasMaxLength(250);
+                .HasColumnType("nvarchar(max)")
+                .HasMaxLength(1000);
             });
 
             modelBuilder.Entity<ShippingDetails>(entity =>

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using Service.Contracts;
@@ -12,7 +8,6 @@ using AutoMapper;
 using Microsoft.Extensions.Configuration;
 using Entities.Models;
 using System.Security.Claims;
-using System.Globalization;
 
 namespace Service
 {
@@ -23,7 +18,7 @@ namespace Service
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole<Guid>> _roleManager;
 
-        private User? _user;
+        private User _user;
 
         public AuthenticationService(IMapper mapper, IConfiguration configuration, UserManager<User> userManager, RoleManager<IdentityRole<Guid>> roleManager)
         {
@@ -63,7 +58,7 @@ namespace Service
 
             if (!result)
             {
-                    
+               
             }
 
             return result;
@@ -80,7 +75,8 @@ namespace Service
 
         private SigningCredentials GetSigningCredentials() 
         {
-            var key = Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("SECRET"));
+            var jwtSettings = _configuration.GetSection("JwtSettings");
+            var key = Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]);
             var secret = new SymmetricSecurityKey(key);
 
             return new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
@@ -109,11 +105,11 @@ namespace Service
 
             var tokenOptions = new JwtSecurityToken
             (
-                issuer: jwtSettings["validIssuer"],
-                audience: jwtSettings["validAudience"],
+                issuer: jwtSettings["Issuer"],
+                audience: jwtSettings["Audience"],
                 claims: claims,
 
-                expires: DateTime.Now.AddMinutes(Convert.ToDouble(jwtSettings["expires"])),
+                expires: DateTime.Now.AddMinutes(Convert.ToDouble(jwtSettings["ExpirationInMinutes"])),
                 signingCredentials: signingCredentials
             );
 

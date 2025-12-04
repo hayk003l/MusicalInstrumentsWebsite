@@ -2,10 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
 using Shared.DataTransferObjects;
-using System.ComponentModel.DataAnnotations;
 using MusicalInstrumentsStore.ActionFilters;
 using Microsoft.AspNetCore.Authorization;
 using Shared.RequestFeatures;
+using Microsoft.AspNetCore.OData.Query;
 
 namespace MusicalInstrumentsStore.Controllers
 {
@@ -22,6 +22,7 @@ namespace MusicalInstrumentsStore.Controllers
         }
 
         [HttpGet]
+        [EnableQuery]
         public async Task<IActionResult> GetItems([FromQuery]ItemsParameters itemsParameters)
         {
             var items = await _service.ItemService.GetItemsAsync(itemsParameters, trackingChanges: false);
@@ -41,7 +42,7 @@ namespace MusicalInstrumentsStore.Controllers
         [HttpPost]
         [Authorize(Roles = "Admin")]
         [ServiceFilter(typeof(ValidationFilterAttribute))]
-        public async Task<IActionResult> CreateItem([FromBody] ItemForCreationDto itemForCreation)
+        public async Task<IActionResult> CreateItem([FromForm] ItemForCreationDto itemForCreation)
         {
 
             var item = await _service.ItemService.CreateItemAsync(itemForCreation);

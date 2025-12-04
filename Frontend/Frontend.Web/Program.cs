@@ -4,10 +4,7 @@ using Frontend.Web.Components;
 using Frontend.Web.Components.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Components.Endpoints;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using Paket;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,12 +16,27 @@ builder.AddServiceDefaults();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy", builder =>
+    
+        builder.WithOrigins(
+            "http://localhost:7028",
+            "https://blazor-production.eba-6pxyt4t4.eu-north-1.elasticbeanstalk.com/",
+            "https://production.eba-i8qxebcm.eu-north-1.elasticbeanstalk.com/"
+        )
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowCredentials()
+    );
+});
+
 builder.Services.AddOutputCache();
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddAuthorizationCore();
 
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-var secretKey = Environment.GetEnvironmentVariable("SECRET");
+var secretKey = jwtSettings["SecretKey"];
 
 builder.Services.AddAuthentication(opt =>
 {
@@ -40,20 +52,20 @@ builder.Services.AddAuthentication(opt =>
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
 
-        ValidIssuer = jwtSettings["validIssuer"],
-        ValidAudience = jwtSettings["validAudience"],
+        ValidIssuer = jwtSettings["Issuer"],
+        ValidAudience = jwtSettings["Audience"],
 
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
     };
 });
 
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
-builder.Services.AddBlazoredLocalStorage();
+builder.Services.AddBlazoredLocalStorage() ;
 builder.Services.AddHttpClient<ApiClient>(client =>
     {
         // This URL uses "https+http://" to indicate HTTPS is preferred over HTTP.
         // Learn more about service discovery scheme resolution at https://aka.ms/dotnet/sdschemes.
-        client.BaseAddress = new("https://localhost:7028/");
+        client.BaseAddress = new("http://production.eba-i8qxebcm.eu-north-1.elasticbeanstalk.com/");
     });
 
 var app = builder.Build();
@@ -68,6 +80,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
+app.UseCors("CorsPolicy");
 app.UseAntiforgery();
 
 app.UseOutputCache();

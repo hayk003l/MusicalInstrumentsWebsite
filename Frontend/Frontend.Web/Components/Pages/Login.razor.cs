@@ -46,7 +46,7 @@ namespace Frontend.Web.Components.Pages
                 }
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 errorMessage = "Սերվերի հետ կապի խնդիր։ Խնդրում ենք փորձել ավելի ուշ։";
                 // Log exception
